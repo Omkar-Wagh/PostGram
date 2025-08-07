@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Page</title>
+
+    <!-- Bootstrap CSS and Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            color: #2c3e50;
+        }
+
+        .profile-container {
+            max-width: 40vw;
+            margin: 100px auto 50px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ddd;
+            padding: 4px;
+        }
+
+        .profile-username {
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .bio {
+            margin-top: 5px;
+            color: #555;
+        }
+        .red-dot-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .red-dot-wrapper.red-dot::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            z-index: 1030;
+        }
+
+        .sidebar a {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        .offcanvas a {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+
+        .offcanvas a:hover {
+            text-decoration: underline;
+        }
+
+        .hover-overlay {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .position-relative:hover .hover-overlay {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                max-width: 90vw;
+                margin-top: 90px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar (Desktop Only) -->
+<div class="sidebar d-none d-md-block">
+    <h3 class="mb-3 mt-3">PostGram</h3>
+
+    <a th:href="@{/posts}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-house-door-fill"></i> Home
+    </a>
+    <a th:href="@{/find}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-search"></i> Search
+    </a>
+    <a th:href="@{/feed}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-compass-fill"></i> Explore
+    </a>
+    <a th:href="@{/notification}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+            <i class="bi bi-bell-fill"></i>
+        </span>
+        Notifications
+    </a>
+    <a th:href="@{/createPost}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-plus-square-fill"></i> Create Post
+    </a>
+    <a th:href="@{'/profile/' + ${trueUser.id}}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-person-circle"></i> Profile
+    </a>
+    <a th:href="@{/logout}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</div>
+
+
+<!-- Mobile Navbar -->
+<nav class="navbar navbar-dark bg-dark d-md-none fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span class="navbar-brand mb-0 h1">PostGram</span>
+    </div>
+</nav>
+
+<!-- Offcanvas Sidebar (Mobile) -->
+<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">PostGram</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <a th:href="@{/posts}"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a th:href="@{/find}"><i class="bi bi-search"></i> Search</a>
+        <a th:href="@{/feed}"><i class="bi bi-compass-fill"></i> Explore</a>
+        <a th:href="@{/notification}">
+    <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+        <i class="bi bi-bell-fill"></i>
+    </span>
+            Notifications
+        </a>
+        <a th:href="@{/createPost}"><i class="bi bi-plus-square-fill"></i> Create Post</a>
+        <a th:href="@{'/profile/' + ${trueUser.id}}"><i class="bi bi-person-circle"></i> Profile</a>
+        <a th:href="@{/logout}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+</div>
+
+<!-- Main Profile Container -->
+<div class="container profile-container">
+
+    <!-- Profile Top Section -->
+    <div class="profile-header mb-4">
+        <img th:src="'data:image/jpeg;base64,' + ${profile.base64Image}" alt="Profile Image" class="profile-image">
+
+        <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="profile-username" th:text="${profile.user.username}">Username</div>
+
+                <form th:action="@{/editProfile}" method="get" th:if="${followStatus == 0}">
+                    <input type="hidden" name="action" value="edit">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Edit Profile</button>
+                </form>
+                <form th:action="@{/logout}" method="get" th:if="${followStatus == 0}">
+                    <input type="hidden" name="action" value="edit">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+                </form>
+                <form th:action="@{/unfollow/{followId}(followId=${profile.user.id})}" method="post" th:if="${followStatus == 1}">
+                    <input type="hidden" name="action" value="follow">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Unfollow</button>
+                </form>
+
+                <form th:action="@{/follow/{followId}(followId=${profile.user.id})}" method="post" th:if="${followStatus == 2}">
+                    <input type="hidden" name="action" value="unfollow">
+                    <button type="submit" class="btn btn-primary btn-sm">Follow</button>
+                </form>
+
+            </div>
+
+            <div class="d-flex gap-5 text-center">
+                <div>
+                    <div><strong>Post</strong></div>
+                    <div th:text="${postCount}">0</div>
+                </div>
+                <div th:onclick="'window.location.href=\'/profile/' + ${profile.user.id} + '/followers\''"
+                     style="cursor: pointer;">
+                    <div><strong>Followers</strong></div>
+                    <div th:text="${followerCount}">0</div>
+                </div>
+                <div th:onclick="'window.location.href=\'/profile/' + ${profile.user.id} + '/following\''"
+                     style="cursor: pointer;">
+                    <div><strong>Following</strong></div>
+                    <div th:text="${followingCount}">0</div>
+                </div>
+            </div>
+
+            <div class="profile-name" th:text="${profile.profileName}">Username</div>
+            <div class="text-start mt-1">
+                <div class="bio" th:text="${profile.profileBio}">Bio goes here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divider Line -->
+    <hr class="my-4">
+
+    <!-- Posts Grid or No Posts Message -->
+    <div class="mt-4">
+        <div>
+            <p class="text-center text-muted fs-5"><i class="bi bi-plus-square-fill"></i> Your Posts</p>
+        </div>
+        <div th:if="${#lists.isEmpty(feedList)}">
+            <p class="text-center text-muted fs-5">No posts yet.</p>
+        </div>
+        <div class="row g-3" th:if="${!#lists.isEmpty(feedList)}">
+            <div class="col-4" th:each="post : ${feedList}">
+                <div class="border rounded position-relative overflow-hidden"
+                     style="aspect-ratio: 1/1; cursor: pointer;"
+                     th:onclick="'window.location.href=\'/userPost/' + ${post.id} + '\''">
+                    <img th:src="'data:' + ${post.imageType} + ';base64,' + ${post.base64Image}"
+                         class="w-100 h-100 object-fit-cover rounded" alt="Post Image">
+                    <div class="hover-overlay">
+                        <div class="d-flex gap-4 fs-5 fw-bold">
+                            <span><i class="bi bi-heart-fill me-1"></i> <span th:text="${post.likeCount}">0</span></span>
+                            <span><i class="bi bi-chat-fill me-1"></i> <span th:text="${post.commentCount}">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

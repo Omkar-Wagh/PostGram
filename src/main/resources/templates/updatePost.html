@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Post</title>
+
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            color: #2c3e50;
+        }
+
+        .custom-container {
+            width: 100%;
+            max-width: 30vw;
+            margin: 25px auto;
+        }
+
+        .form-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .fixed-image {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .red-dot-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .red-dot-wrapper.red-dot::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            z-index: 1030;
+        }
+
+        .sidebar a {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .custom-container {
+                max-width: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar (Desktop Only) -->
+<div class="sidebar d-none d-md-block">
+    <h3 class="mb-3 mt-3">PostGram</h3>
+
+    <a th:href="@{/posts}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-house-door-fill"></i> Home
+    </a>
+    <a th:href="@{/find}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-search"></i> Search
+    </a>
+    <a th:href="@{/feed}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-compass-fill"></i> Explore
+    </a>
+    <a th:href="@{/notification}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+            <i class="bi bi-bell-fill"></i>
+        </span>
+        Notifications
+    </a>
+    <a th:href="@{/createPost}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-plus-square-fill"></i> Create Post
+    </a>
+    <a th:href="@{'/profile/' + ${trueUser.id}}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-person-circle"></i> Profile
+    </a>
+    <a th:href="@{/logout}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</div>
+
+<!-- Mobile Navbar -->
+<nav class="navbar navbar-dark bg-dark d-md-none fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span class="navbar-brand mb-0 h1">PostGram</span>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu (Mobile Only) -->
+<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">PostGram</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <a th:href="@{/posts}"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a th:href="@{/find}"><i class="bi bi-search"></i> Search</a>
+        <a th:href="@{/feed}"><i class="bi bi-compass-fill"></i> Explore</a>
+        <a th:href="@{/notification}">
+    <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+        <i class="bi bi-bell-fill"></i>
+    </span>
+            Notifications
+        </a>
+        <a th:href="@{/createPost}"><i class="bi bi-plus-square-fill"></i> Create Post</a>
+        <a th:href="@{'/profile/' + ${trueUser.id}}"><i class="bi bi-person-circle"></i> Profile</a>
+    </div>
+</div>
+
+<!-- Main Form Container -->
+<div class="custom-container">
+    <div class="form-card">
+        <div class="profile-header">
+            <h2>Update Post</h2>
+        </div>
+
+        <!-- Update Form -->
+        <form th:action="@{'/updatePost/' + ${post.id}}" method="post" enctype="multipart/form-data" th:object="${post}">
+            <!-- Post ID -->
+            <input type="hidden" th:field="*{id}" />
+
+            <!-- Existing Image Preview -->
+            <div class="mb-3 text-center">
+                <img th:if="*{base64Image != null}"
+                     th:src="'data:' + ${post.imageType} + ';base64,' + ${post.base64Image}"
+                     id="imagePreview"
+                     class="fixed-image"
+                     alt="Existing Post Image">
+                <p th:if="*{base64Image == null}" class="text-muted text-center">No image uploaded</p>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <input class="form-control" type="file" id="postImage" name="postImage" accept="image/*" onchange="previewImage(event)" required>
+            </div>
+
+            <!-- Caption -->
+            <div class="mb-3">
+                <label for="caption" class="form-label">Caption</label>
+                <textarea class="form-control" id="caption" th:field="*{caption}" rows="4" placeholder="Write your thoughts..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Update Post</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Image Preview Script -->
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById("imagePreview");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+</body>
+</html>

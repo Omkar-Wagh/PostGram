@@ -1,0 +1,194 @@
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1">-->
+<!--    <title>Login</title>-->
+<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--</head>-->
+<!--<body class="bg-light">-->
+
+<!--<div class="container d-flex justify-content-center align-items-center vh-100">-->
+<!--    <div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px;">-->
+<!--        <h2 class="text-center mb-4">Login</h2>-->
+<!--        <form th:action="@{/login}" method="post">-->
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">Username:</label>-->
+<!--                <input type="text" name="username" class="form-control" required />-->
+<!--            </div>-->
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">Password:</label>-->
+<!--                <input type="password" name="password" class="form-control" required />-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Remember Me Checkbox &ndash;&gt;-->
+<!--            <div class="form-check mb-3">-->
+<!--                <input class="form-check-input" type="checkbox" name="remember-me" id="rememberMe">-->
+<!--                <label class="form-check-label" for="rememberMe">-->
+<!--                    Remember Me-->
+<!--                </label>-->
+<!--            </div>-->
+
+<!--            <div class="d-grid">-->
+<!--                <button type="submit" class="btn btn-primary">Login</button>-->
+<!--            </div>-->
+<!--        </form>-->
+
+<!--        <p class="text-center mt-3">-->
+<!--            New user? <a th:href="@{/register}" class="text-decoration-none">Register here</a>-->
+<!--        </p>-->
+
+<!--        &lt;!&ndash; Show login errors &ndash;&gt;-->
+<!--        <p th:if="${param.error}" class="text-danger text-center">Invalid username or password</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login • PostGram</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #fdfbfb, #ebedee);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .overlay {
+            background-color: rgba(255, 255, 255, 0.6);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .card {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(200, 200, 200, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: auto;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-logo {
+            font-size: 28px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #262626;
+            letter-spacing: 1px;
+        }
+
+        .animated-icon {
+            width: 60px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+
+        .form-control {
+            background-color: rgba(250, 250, 250, 0.95);
+            border: 1px solid #dbdbdb;
+            border-radius: 10px;
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #a0a0a0;
+        }
+
+        .btn-primary {
+            background-color: #0095f6;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #007fd1;
+        }
+
+        .form-check-label {
+            font-size: 14px;
+        }
+
+        .text-danger {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .register-redirect {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .register-redirect a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #00376b;
+        }
+    </style>
+</head>
+<body>
+<div class="overlay"></div>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card">
+        <img class="animated-icon" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2FqZnE5OHgxOHhxbTczZWI1NHBsN3RxaDZjbWpsZThhZnllNmF5NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ZVik7pBtu9dNS/giphy.gif" alt="Login Icon">
+        <div class="custom-logo">PostGram</div>
+        <p class="text-center mb-4 text-muted">Welcome back! Please log in.</p>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <input type="text" name="username" class="form-control" placeholder="👤 Username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="🔒 Password" required>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="remember-me" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Remember Me</label>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+
+            <!-- Show login error if any -->
+            <p th:if="${param.error}" class="text-danger text-center">Invalid username or password</p>
+        </form>
+
+        <div class="register-redirect">
+            New to PostGram? <a th:href="@{/register}">Create an account</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

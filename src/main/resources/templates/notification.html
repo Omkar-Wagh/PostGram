@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            color: #2c3e50;
+        }
+
+        .notification-container {
+            max-width: 45vw;
+            margin: 25px auto 0px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        .notification-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .trigger-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .notification-text {
+            flex-grow: 1;
+        }
+
+        .notification-text p {
+            margin: 0;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .notification-container {
+                max-width: 90vw;
+                margin-top: 25px;
+            }
+        }
+
+        .red-dot-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .red-dot-wrapper.red-dot::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+        }
+
+        .sidebar a {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        .offcanvas a {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+
+        .offcanvas a:hover {
+            text-decoration: underline;
+        }
+
+        .red-dot {
+            position: relative;
+        }
+
+        .red-dot::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            right: -6px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar (Desktop Only) -->
+<div class="sidebar d-none d-md-block">
+    <h3 class="mb-3 mt-3">PostGram</h3>
+
+    <a th:href="@{/posts}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-house-door-fill"></i> Home
+    </a>
+    <a th:href="@{/find}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-search"></i> Search
+    </a>
+    <a th:href="@{/feed}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-compass-fill"></i> Explore
+    </a>
+    <a th:href="@{/notification}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+            <i class="bi bi-bell-fill"></i>
+        </span>
+        Notifications
+    </a>
+    <a th:href="@{/createPost}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-plus-square-fill"></i> Create Post
+    </a>
+    <a th:href="@{'/profile/' + ${trueUser.id}}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-person-circle"></i> Profile
+    </a>
+    <a th:href="@{/logout}" class="d-flex align-items-center gap-1 mb-2 text-white text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</div>
+
+<!-- Mobile Navbar -->
+<nav class="navbar navbar-dark bg-dark d-md-none fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span class="navbar-brand mb-0 h1">PostGram</span>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu -->
+<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">PostGram</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <a th:href="@{/posts}"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a th:href="@{/find}"><i class="bi bi-search"></i> Search</a>
+        <a th:href="@{/feed}"><i class="bi bi-compass-fill"></i> Explore</a>
+        <a th:href="@{/notification}">
+            <span class="red-dot-wrapper" th:classappend="${notificationCount > 0} ? ' red-dot'">
+                <i class="bi bi-bell-fill"></i>
+            </span>
+            Notifications
+        </a>
+        <a th:href="@{/createPost}"><i class="bi bi-plus-square-fill"></i> Create Post</a>
+        <a th:href="@{'/profile/' + ${trueUser.id}}"><i class="bi bi-person-circle"></i> Profile</a>
+    </div>
+</div>
+
+<!-- Notification Container -->
+<div class="notification-container">
+    <div class="notification-title">Notifications</div>
+
+    <!-- No notifications -->
+    <div th:if="${#lists.isEmpty(notifications)}">
+        <p>No notifications yet.</p>
+    </div>
+
+    <!-- Notification list -->
+    <div th:each="notification : ${notifications}" class="notification-card">
+        <img th:if="${notification.profileImage != null}"
+             th:src="'data:image/jpeg;base64,' + ${notification.profileImage}"
+             class="trigger-img"
+             alt="User Image"
+             th:onclick="'window.location.href=\'/profile/' + ${notification.id} + '\''" />
+
+        <div class="notification-text">
+            <p>
+                <strong th:text="${notification.profileName}"
+                        th:onclick="'window.location.href=\'/profile/' + ${notification.id} + '\''"
+                        style="cursor: pointer;">
+                    User
+                </strong>
+                <span th:switch="${notification.type}">
+                    <span th:case="'1'">started following you.</span>
+                    <span th:case="'2'">commented on your post.</span>
+                    <span th:case="'3'">liked your post.</span>
+                    <span th:case="*">new notification.</span>
+                </span>
+            </p>
+            <div class="notification-time" th:text="${notification.timeAgo}">2 hours ago</div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
